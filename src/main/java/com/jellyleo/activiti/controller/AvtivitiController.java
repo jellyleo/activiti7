@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * 功能描述:请假控制器
+ * 功能描述:控制器
  *
  * @author Jelly
  * @created 2019年11月19日
@@ -275,7 +275,7 @@ public class AvtivitiController extends BaseController {
 
 	/**
 	 * 
-	 * 功能描述:完成任务
+	 * 功能描述:删除流程
 	 *
 	 * @param request
 	 * @param response
