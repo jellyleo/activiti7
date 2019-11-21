@@ -3,11 +3,3 @@
 #### 介绍
 springboot2集成activiti7实现的简单审批流程
 修改application.properties 里面数据库配置即可启动
-
-注:
-ProcessRuntime类内部最终调用repositoryService和runtimeService相关API。
-TaskRuntime类内部调用taskService。
-TaskAdminRuntime类内部调用taskService
-ProcessRuntime类需要ACTIVITI_USER权限。
-TaskRuntime需要ACTIVITI_USER权限。
-TaskAdminRuntime需要ACTIVITI_ADMIN权限。
