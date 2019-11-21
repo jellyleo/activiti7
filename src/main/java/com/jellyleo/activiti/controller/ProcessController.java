@@ -205,7 +205,9 @@ public class ProcessController extends BaseController {
 
 		try {
 			HashMap<String, Object> variables = new HashMap<>();
-			variables.put(key, value);
+			if (!StringUtils.isEmpty(key)) {
+				variables.put(key, value);
+			}
 
 			ProcessInstance instance = runtimeService.startProcessInstanceByKey(processDefinitionKey, variables);
 

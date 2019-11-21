@@ -160,8 +160,12 @@ public class TaskController extends BaseController {
 		String key = request.getParameter("key");
 		String value = request.getParameter("value");
 		try {
-
-			taskService.setVariable(taskId, key, value);
+			if (!StringUtils.isEmpty(key)) {
+				// 设置流程参数（单）
+				taskService.setVariable(taskId, key, value);
+//				// 设置流程参数（多）
+//				taskService.setVariables(taskId, new HashMap<>());
+			}
 			taskService.complete(taskId);
 			System.out.println("任务完成");
 			System.out.println("任务ID:" + taskId);
