@@ -7,6 +7,7 @@ package com.jellyleo.activiti.controller;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipInputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
+import com.jellyleo.activiti.entity.CommonVariable;
+import com.jellyleo.activiti.util.BeanUtil;
 
 /**
  * 功能描述:流程控制器
@@ -195,18 +200,17 @@ public class ProcessController extends BaseController {
 	public String start(HttpServletRequest request, HttpServletResponse response) {
 
 		String processDefinitionKey = request.getParameter("processId");
+		String variable = request.getParameter("variable");
 
 		if (StringUtils.isEmpty(processDefinitionKey)) {
 			return "param error";
 		}
 
-		String key = request.getParameter("key");
-		String value = request.getParameter("value");
-
 		try {
-			HashMap<String, Object> variables = new HashMap<>();
-			if (!StringUtils.isEmpty(key)) {
-				variables.put(key, value);
+			Map<String, Object> variables = new HashMap<>();
+			if (!StringUtils.isEmpty(variable)) {
+				CommonVariable variablesEntity = JSON.parseObject(variable, CommonVariable.class);
+				variables = BeanUtil.beanToMap(variablesEntity);
 			}
 
 			ProcessInstance instance = runtimeService.startProcessInstanceByKey(processDefinitionKey, variables);
@@ -215,6 +219,7 @@ public class ProcessController extends BaseController {
 			System.out.println("流程定义ID:" + instance.getProcessDefinitionId());
 			System.out.println("*****************************************************************************");
 		} catch (Exception e) {
+			e.printStackTrace();
 			return "fail";
 		}
 		return "success";

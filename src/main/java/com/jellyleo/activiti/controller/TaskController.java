@@ -4,16 +4,24 @@
  */
 package com.jellyleo.activiti.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
+import com.jellyleo.activiti.entity.CommonVariable;
+import com.jellyleo.activiti.util.BeanUtil;
 
 /**
  * 功能描述:任务控制器
@@ -105,6 +113,53 @@ public class TaskController extends BaseController {
 
 	/**
 	 * 
+	 * 功能描述:查询当前全部任务
+	 *
+	 * @param request
+	 * @param response
+	 * @see [相关类/方法](可选)
+	 * @since [产品/模块版本](可选)
+	 */
+	@RequestMapping(value = "/list")
+	@ResponseBody
+	public String listTask(HttpServletRequest request, HttpServletResponse response) {
+
+		String processInstanceId = request.getParameter("processInstanceId");
+
+		if (StringUtils.isEmpty(processInstanceId)) {
+			return "param error";
+		}
+
+		try {
+			List<Task> taskList = taskService.createTaskQuery()// 创建查询对象
+					.processInstanceId(processInstanceId)// 通过流程实例id来查询当前任务
+					.list();// 获取单个查询结果
+			if (CollectionUtils.isEmpty(taskList)) {
+				System.out.println("流程已结束");
+				System.out.println("流程实例ID:" + processInstanceId);
+				System.out.println("*****************************************************************************");
+				return "success";
+			}
+
+			taskList.forEach(task -> {
+				System.out.println("任务ID:" + task.getId());
+				System.out.println("任务名称:" + task.getName());
+				System.out.println("任务的创建时间:" + task.getCreateTime());
+				System.out.println("任务的办理人:" + task.getAssignee());
+				System.out.println("流程实例ID：" + task.getProcessInstanceId());
+				System.out.println("执行对象ID:" + task.getExecutionId());
+				System.out.println("流程定义ID:" + task.getProcessDefinitionId());
+				System.out.println("*****************************************************************************");
+			});
+
+		} catch (Exception e) {
+			return "fail";
+		}
+		return "success";
+	}
+
+	/**
+	 * 
 	 * 功能描述:查询进行中任务
 	 *
 	 * @param request
@@ -152,24 +207,27 @@ public class TaskController extends BaseController {
 	public String complete(HttpServletRequest request, HttpServletResponse response) {
 
 		String taskId = request.getParameter("taskid");
+		String variable = request.getParameter("variable");
 
 		if (StringUtils.isEmpty(taskId)) {
 			return "param error";
 		}
 
-		String key = request.getParameter("key");
-		String value = request.getParameter("value");
 		try {
-			if (!StringUtils.isEmpty(key)) {
-				// 设置流程参数（单）
-				taskService.setVariable(taskId, key, value);
-//				// 设置流程参数（多）
-//				taskService.setVariables(taskId, new HashMap<>());
+			Map<String, Object> variables = new HashMap<>();
+			if (!StringUtils.isEmpty(variable)) {
+				CommonVariable variablesEntity = JSON.parseObject(variable, CommonVariable.class);
+				variables = BeanUtil.beanToMap(variablesEntity);
 			}
+//			// 设置流程参数（单）
+//			taskService.setVariable(taskId, key, value);
+			// 设置流程参数（多）
+			taskService.setVariables(taskId, variables);
+
 			taskService.complete(taskId);
 			System.out.println("任务完成");
 			System.out.println("任务ID:" + taskId);
-			System.out.println("任务处理结果:" + key + "=" + value);
+			System.out.println("任务处理结果:" + variables);
 			System.out.println("*****************************************************************************");
 		} catch (Exception e) {
 			return "fail";

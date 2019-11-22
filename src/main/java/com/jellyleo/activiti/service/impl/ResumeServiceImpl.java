@@ -48,6 +48,10 @@ public class ResumeServiceImpl implements ResumeService {
 		System.out.println("处理结果为:负数");
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.jellyleo.activiti.service.ResumeService#otherNumber()
+	 */
 	@Override
 	public void otherNumber() {
 		System.out.println("处理结果为:非整数");
