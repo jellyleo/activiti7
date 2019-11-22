@@ -7,9 +7,12 @@ springboot2集成activiti7实现的简单工作流
 **流程图介绍**
 >claim-expense
 >>简单报销审批流程
+
 >exclusive-gateway
->>排他网关
+>>排他网关学习
+
 >listener
->>流程执行监听和任务监听
+>>执行监听和任务监听
+
 >countersign
 >>会签
