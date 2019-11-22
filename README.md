@@ -10,6 +10,10 @@ springboot2集成activiti7实现的简单工作流，修改application.propertie
 * 简单报销审批流程
 ![blockchain](src/main/resources/processes/claim-expense/claim-expense.png)
 
+>shopping
+* 购物
+![blockchain](src/main/resources/processes/shopping/shopping.png)
+
 >exclusive-gateway
 * 排他网关学习
 ![blockchain](src/main/resources/processes/exclusive-gateway/exclusive-gateway.png)
