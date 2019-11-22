@@ -2,6 +2,7 @@
 
 #### 介绍
 springboot2集成activiti7实现的简单工作流
+
 修改application.properties 里面数据库配置即可启动
 
 **流程图介绍**
