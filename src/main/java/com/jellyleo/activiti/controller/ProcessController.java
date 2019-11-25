@@ -214,6 +214,9 @@ public class ProcessController extends BaseController {
 			}
 
 			ProcessInstance instance = runtimeService.startProcessInstanceByKey(processDefinitionKey, variables);
+//			// Businesskey:业务标识，通常为业务表的主键，业务标识和流程实例一一对应。业务标识来源于业务系统。存储业务标识就是根据业务标识来关联查询业务系统的数据
+//			ProcessInstance instance = runtimeService.startProcessInstanceByKey(processDefinitionKey, businessKey,
+//					variables);
 
 			System.out.println("流程实例ID:" + instance.getId());
 			System.out.println("流程定义ID:" + instance.getProcessDefinitionId());
@@ -247,6 +250,140 @@ public class ProcessController extends BaseController {
 		try {
 			runtimeService.deleteProcessInstance(processId, "流程已完毕");
 			System.out.println("终止流程");
+			System.out.println("*****************************************************************************");
+		} catch (Exception e) {
+			return "fail";
+		}
+		return "success";
+	}
+
+	/**
+	 * 
+	 * 功能描述:流程实例挂起
+	 *
+	 * @param request
+	 * @param response
+	 * @see [相关类/方法](可选)
+	 * @since [产品/模块版本](可选)
+	 */
+	@RequestMapping(value = "/instance/suspend")
+	@ResponseBody
+	public String suspendProcessInstance(HttpServletRequest request, HttpServletResponse response) {
+
+		String processInstanceId = request.getParameter("processInstanceId");
+
+		if (StringUtils.isEmpty(processInstanceId)) {
+			return "param error";
+		}
+
+		try {
+			// 根据一个流程实例的id挂起该流程实例
+			runtimeService.suspendProcessInstanceById(processInstanceId);
+			ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+					.processInstanceId(processInstanceId).singleResult();
+			System.out.println("流程实例ID:" + processInstance.getId());
+			System.out.println("流程定义ID:" + processInstance.getProcessDefinitionId());
+			System.out.println("流程实例状态:" + processInstance.isSuspended());
+			System.out.println("*****************************************************************************");
+		} catch (Exception e) {
+			return "fail";
+		}
+		return "success";
+	}
+
+	/**
+	 * 
+	 * 功能描述:流程定义挂起
+	 *
+	 * @param request
+	 * @param response
+	 * @see [相关类/方法](可选)
+	 * @since [产品/模块版本](可选)
+	 */
+	@RequestMapping(value = "/definition/suspend")
+	@ResponseBody
+	public String suspendProcessDefinition(HttpServletRequest request, HttpServletResponse response) {
+
+		String processDefinitionId = request.getParameter("processDefinitionId");
+
+		if (StringUtils.isEmpty(processDefinitionId)) {
+			return "param error";
+		}
+
+		try {
+			// 根据一个流程定义的id挂起该流程实例
+			repositoryService.suspendProcessDefinitionByKey(processDefinitionId);
+			ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+					.processDefinitionKey(processDefinitionId).singleResult();
+			System.out.println("流程定义ID:" + processDefinition.getId());
+			System.out.println("流程定义状态:" + processDefinition.isSuspended());
+			System.out.println("*****************************************************************************");
+		} catch (Exception e) {
+			return "fail";
+		}
+		return "success";
+	}
+
+	/**
+	 * 
+	 * 功能描述:流程实例激活
+	 *
+	 * @param request
+	 * @param response
+	 * @see [相关类/方法](可选)
+	 * @since [产品/模块版本](可选)
+	 */
+	@RequestMapping(value = "/instance/activate")
+	@ResponseBody
+	public String activateProcessInstance(HttpServletRequest request, HttpServletResponse response) {
+
+		String processInstanceId = request.getParameter("processInstanceId");
+
+		if (StringUtils.isEmpty(processInstanceId)) {
+			return "param error";
+		}
+
+		try {
+			// 根据一个流程实例id激活该流程
+			runtimeService.activateProcessInstanceById(processInstanceId);
+			ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+					.processInstanceId(processInstanceId).singleResult();
+			System.out.println("流程实例ID:" + processInstance.getId());
+			System.out.println("流程定义ID:" + processInstance.getProcessDefinitionId());
+			System.out.println("流程实例状态:" + processInstance.isSuspended());
+			System.out.println("*****************************************************************************");
+		} catch (Exception e) {
+			return "fail";
+		}
+		return "success";
+	}
+
+	/**
+	 * 
+	 * 功能描述:流程定义激活
+	 *
+	 * @param request
+	 * @param response
+	 * @see [相关类/方法](可选)
+	 * @since [产品/模块版本](可选)
+	 */
+	@RequestMapping(value = "/definition/activate")
+	@ResponseBody
+	public String activateProcessDefinition(HttpServletRequest request, HttpServletResponse response) {
+
+		String processDefinitionId = request.getParameter("processDefinitionId");
+
+		if (StringUtils.isEmpty(processDefinitionId)) {
+			return "param error";
+		}
+
+		try {
+			// 根据一个流程定义的id挂起该流程实例
+			repositoryService.activateProcessDefinitionById(processDefinitionId);
+			ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+					.processDefinitionKey(processDefinitionId).singleResult();
+			System.out.println("流程定义ID:" + processDefinition.getId());
+			System.out.println("流程定义状态:" + processDefinition.isSuspended());
 			System.out.println("*****************************************************************************");
 		} catch (Exception e) {
 			return "fail";
