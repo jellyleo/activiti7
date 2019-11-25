@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
@@ -224,10 +225,97 @@ public class TaskController extends BaseController {
 			// 设置流程参数（多）
 			taskService.setVariables(taskId, variables);
 
+			// 若是委托任务，请先解决委托任务
+			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+			if (DelegationState.PENDING.equals(task.getDelegationState())) {
+				return "resolve delegation first";
+			}
 			taskService.complete(taskId);
 			System.out.println("任务完成");
 			System.out.println("任务ID:" + taskId);
 			System.out.println("任务处理结果:" + variables);
+			System.out.println("*****************************************************************************");
+		} catch (Exception e) {
+			return "fail";
+		}
+		return "success";
+	}
+
+	/**
+	 * 
+	 * 功能描述:任务委托
+	 *
+	 * @param request
+	 * @param response
+	 * @see [相关类/方法](可选)
+	 * @since [产品/模块版本](可选)
+	 */
+	@RequestMapping(value = "/assignee")
+	@ResponseBody
+	public String assignee(HttpServletRequest request, HttpServletResponse response) {
+
+		String taskId = request.getParameter("taskid");
+		String assignee = request.getParameter("assignee");
+
+		if (StringUtils.isEmpty(taskId) || StringUtils.isEmpty(assignee)) {
+			return "param error";
+		}
+
+		try {
+			taskService.delegateTask(taskId, assignee);
+			System.out.println("任务已委托给：" + assignee);
+			System.out.println("*****************************************************************************");
+		} catch (Exception e) {
+			return "fail";
+		}
+		return "success";
+	}
+
+	/**
+	 * 
+	 * 功能描述:解决委托任务
+	 *
+	 * @param request
+	 * @param response
+	 * @see [相关类/方法](可选)
+	 * @since [产品/模块版本](可选)
+	 */
+	@RequestMapping(value = "/resolve")
+	@ResponseBody
+	public String resolve(HttpServletRequest request, HttpServletResponse response) {
+
+		String taskId = request.getParameter("taskid");
+		String variable = request.getParameter("variable");
+
+		if (StringUtils.isEmpty(taskId)) {
+			return "param error";
+		}
+
+		try {
+			Map<String, Object> variables = new HashMap<>();
+			if (!StringUtils.isEmpty(variable)) {
+				CommonVariable variablesEntity = JSON.parseObject(variable, CommonVariable.class);
+				variables = BeanUtil.beanToMap(variablesEntity);
+			}
+//			// 设置流程参数（单）
+//			taskService.setVariable(taskId, key, value);
+			// 设置流程参数（多）
+			taskService.setVariables(taskId, variables);
+
+			// 根据taskId提取任务
+			Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+			if (task.getOwner() != null && !task.getOwner().equals("null")) {
+				DelegationState delegationState = task.getDelegationState();
+				if (delegationState.equals(DelegationState.RESOLVED)) {
+					System.out.println("此委托任务已是完结状态");
+				} else if (delegationState.equals(DelegationState.PENDING)) {
+					// 如果是委托任务需要做处理
+					taskService.resolveTask(taskId, variables);
+				} else {
+					System.out.println("此任务不是委托任务");
+				}
+			}
+			System.out.println("委托任务处理完毕");
 			System.out.println("*****************************************************************************");
 		} catch (Exception e) {
 			return "fail";
