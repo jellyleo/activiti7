@@ -1,9 +1,11 @@
 # Activiti7 + SpringBoot2
 
 ## 介绍
-* springboot2集成activiti7实现的简单工作流，修改application.properties数据库配置即可启动。
+* SpringBoot2集成Activiti7实现的简单工作流，修改application.properties数据库配置即可启动。
+
 
 ---
+
 
 ### 流程图介绍
 >claim-expense
